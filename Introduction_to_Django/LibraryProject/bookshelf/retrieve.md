@@ -1,6 +1,6 @@
 from bookshelf.models import Book
 
-books = Book.objects.all()
+books = Book.objects.get()
 for book in books:
     print(f"Title:{book.title}, Author:{book.author}, Publication_year:{book.publication_year}")
 
