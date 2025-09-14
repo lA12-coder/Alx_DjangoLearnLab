@@ -6,7 +6,7 @@ from django.contrib.auth.admin import UserAdmin as UserBaseAdmin
 from .models import CustomUser
 # Register your models here.
 
-@admin.register(Book)
+
 class BookAdmin(admin.ModelAdmin):
     list_display = ('title', 'author', 'publication_year')
     list_filter = ('author', 'publication_year')
@@ -25,4 +25,6 @@ class CustomUserAdmin(UserBaseAdmin):
         (None, {'fields': ('date_of_birth', 'profile_photo')}),
     )
 
+
 admin.site.register(CustomUser,CustomUserAdmin)
+admin.site.register(Book,BookAdmin)
