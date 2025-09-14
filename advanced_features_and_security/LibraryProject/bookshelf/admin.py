@@ -26,5 +26,5 @@ class CustomUserAdmin(UserBaseAdmin):
     )
 
 
-admin.site.register(CustomUser,CustomUserAdmin)
-admin.site.register(Book,BookAdmin)
+admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(Book, BookAdmin)
