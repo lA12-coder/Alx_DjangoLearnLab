@@ -1,30 +1,23 @@
 from django.contrib import admin
-from .models import Book
-from django import forms
-from django.contrib.auth import get_user_model
-from django.contrib.auth.admin import UserAdmin as UserBaseAdmin
+from django.contrib.auth.admin import UserAdmin
 from .models import CustomUser
-# Register your models here.
 
 
-class BookAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author', 'publication_year')
-    list_filter = ('author', 'publication_year')
-    search_fields = ('title', 'author')
-
-
-
-
-class CustomUserAdmin(UserBaseAdmin):
-    model=CustomUser
-    list_display = ('username','email', 'first_name', 'last_name','is_staff', 'date_of_birth')
-    fieldsets = UserBaseAdmin.fieldsets + (
-        (None, {'fields': ('date_of_birth', 'profile_photo')}),
+class CustomUserAdmin(UserAdmin):
+    model = CustomUser
+    # Show these fields in the user list
+    list_display = ("username", "email", "date_of_birth", "is_staff", "is_active")
+    # Add fields when viewing/editing a user
+    fieldsets = UserAdmin.fieldsets + (
+        ("Additional Info", {"fields": ("date_of_birth", "profile_photo")}),
     )
-    add_fieldsets = UserBaseAdmin.add_fieldsets + (
-        (None, {'fields': ('date_of_birth', 'profile_photo')}),
+    # Add fields when creating a user
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        ("Additional Info", {"fields": ("date_of_birth", "profile_photo")}),
     )
 
 
+# Register CustomUser with CustomUserAdmin
 admin.site.register(CustomUser, CustomUserAdmin)
-admin.site.register(Book, BookAdmin)
+
+
