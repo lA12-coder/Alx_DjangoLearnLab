@@ -32,3 +32,7 @@ def book_edit(request, pk):
         form = BookForm(instance=book)
     return render(request, 'your_app_label/book_form.html', {'form': form, 'book': book})
   
+  
+def book_list(request):
+    books = Book.objects.all().order_by('-publication_year', 'title')
+    return render(request, 'bookshelf/books_list.html', {'books': books})
