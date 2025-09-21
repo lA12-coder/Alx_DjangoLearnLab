@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,12 +21,24 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-qgm764cxjf=fwvjrv)i8nboyec$y9pm2)2dh*^fs6$0jgr@7-3'
+# Read SECRET_KEY from environment in production. In development, when the
+# environment variable is not set, create a secure random key at startup.
+# This avoids committing a weak hard-coded secret to source control.
+try:
+    # Import here to avoid adding django to requirements if settings are
+    # inspected outside a Django runtime in some contexts.
+    from django.core.management.utils import get_random_secret_key
+except Exception:
+    get_random_secret_key = None
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY') or (
+    get_random_secret_key() if get_random_secret_key is not None else 'change-me'
+)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+# DEBUG should be False in production. Control it via environment variable.
+DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
+
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 
 # -------------------------
@@ -52,6 +65,23 @@ SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 # Prevent this site from being framed to avoid clickjacking
 X_FRAME_OPTIONS = 'DENY'
+
+# -------------------------
+# HTTPS / HSTS / SSL redirect settings
+# -------------------------
+# Redirect all HTTP requests to HTTPS. Set to True in production.
+SECURE_SSL_REDIRECT = True
+# HTTP Strict Transport Security (HSTS) - tell browsers to use HTTPS only.
+# Start with a low value for testing (e.g., 60) and then increase to 31536000
+# (1 year) once you are confident HTTPS is correctly configured.
+SECURE_HSTS_SECONDS = int(os.environ.get('SECURE_HSTS_SECONDS', '31536000'))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = os.environ.get('SECURE_HSTS_INCLUDE_SUBDOMAINS', 'True') == 'True'
+SECURE_HSTS_PRELOAD = os.environ.get('SECURE_HSTS_PRELOAD', 'True') == 'True'
+
+# If your Django app is behind a proxy/load-balancer that handles SSL,
+# set SECURE_PROXY_SSL_HEADER so Django knows the original request scheme.
+# Common header from many proxies is 'HTTP_X_FORWARDED_PROTO' = 'https'
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 
