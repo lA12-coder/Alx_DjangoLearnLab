@@ -4,6 +4,7 @@ from django.contrib import messages
 from .forms import BookForm
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Book
+from django.db.models import Q
 
 @login_required
 @permission_required('bookshelf.can_create', raise_exception=True)
@@ -33,6 +34,20 @@ def book_edit(request, pk):
     return render(request, 'your_app_label/book_form.html', {'form': form, 'book': book})
   
   
-def book_list(request):
-    books = Book.objects.all().order_by('-publication_year', 'title')
-    return render(request, 'bookshelf/books_list.html', {'books': books})
+@login_required
+@permission_required('bookshelf.can_view', raise_exception=True)
+def books_list(request):
+    """
+    Safe search: use Q objects & ORM to prevent injection.
+    Avoid building SQL strings with user input.
+    """
+    query = request.GET.get('q', '').strip()
+    books = Book.objects.all()
+    if query:
+        # Parameterized via ORM, safe from SQL injection
+        books = books.filter(
+            Q(title__icontains=query) |
+            Q(author__icontains=query)
+        )
+    # paginate if needed
+    return render(request, 'bookshelf/book_list.html', {'books': books})
