@@ -13,14 +13,12 @@ class BookAdmin(admin.ModelAdmin):
     search_fields = ('title', 'author')
 
 
-
-
 class CustomUserAdmin(UserBaseAdmin):
     model=CustomUser
     list_display = ('username','email', 'first_name', 'last_name','is_staff', 'date_of_birth')
-    fieldsets = UserBaseAdmin.fieldsets + (
+    fieldsets = list(UserBaseAdmin.fieldsets) + [
         (None, {'fields': ('date_of_birth', 'profile_photo')}),
-    )
+    ]
     add_fieldsets = UserBaseAdmin.add_fieldsets + (
         (None, {'fields': ('date_of_birth', 'profile_photo')}),
     )
