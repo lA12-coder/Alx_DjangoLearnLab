@@ -25,7 +25,8 @@ SECRET_KEY = 'django-insecure-qgm764cxjf=fwvjrv)i8nboyec$y9pm2)2dh*^fs6$0jgr@7-3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost,127.0.0.1']
+
 
 # Session & CSRF cookies: send only over HTTPS in production
 SESSION_COOKIE_SECURE = True
