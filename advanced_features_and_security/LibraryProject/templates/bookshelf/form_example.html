@@ -1,23 +1,24 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>Form Example</title>
-</head>
-<body>
-  <h1>Submit</h1>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Form Example</title>
+  </head>
+  <body>
+    <h1>Submit</h1>
 
-  <!-- Always include csrf token in POST forms -->
-  <form method="post" action="">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Submit</button>
-  </form>
+    <!-- Always include csrf token in POST forms -->
+    <!-- If your form has file inputs (ImageField/FileField) add enctype="multipart/form-data" -->
+    <form method="post" action="" enctype="multipart/form-data">
+      {% csrf_token %} {{ form.as_p }}
+      <button type="submit">Submit</button>
+    </form>
 
-  <!-- If you render user-provided content, escape it by default.
+    <!-- If you render user-provided content, escape it by default.
        Use the safe filter only when content is sanitized or needed. -->
-  {% if note %}
-    <p>{{ note }}</p>          {# auto-escaped #}
-  {% endif %}
-</body>
+    {% if note %}
+    <p>{{ note }}</p>
+    {# auto-escaped #} {% endif %}
+  </body>
 </html>
