@@ -95,6 +95,7 @@ INSTALLED_APPS = [
     'bookshelf.apps.BookshelfConfig',
     'rest_framework',
     'api',
+    'rest_framework.authtoken'
 ]
 
 MIDDLEWARE = [
