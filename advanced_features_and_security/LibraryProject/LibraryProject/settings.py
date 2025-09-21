@@ -25,19 +25,32 @@ SECRET_KEY = 'django-insecure-qgm764cxjf=fwvjrv)i8nboyec$y9pm2)2dh*^fs6$0jgr@7-3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['localhost,127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
-# Session & CSRF cookies: send only over HTTPS in production
+# -------------------------
+# Security settings (production)
+# -------------------------
+# The following settings enable common HTTP security headers and make
+# session/CSRF cookies only be sent over HTTPS. Review before changing
+# for development (you may need to disable some during local testing).
+
+# Cookies: only send cookies over HTTPS and make session cookies inaccessible to JS
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
-CSRF_COOKIE_HTTPONLY = False 
+# Setting CSRF_COOKIE_HTTPONLY to True prevents JavaScript from reading the
+# CSRF cookie. This improves security but may break some AJAX/JS clients that
+# expect to read the cookie. Keep True in production unless you intentionally
+# need client-side access to the CSRF token.
+CSRF_COOKIE_HTTPONLY = True
 
-
-# Browser level protection
+# Browser-level headers
+# Set to True to send 'X-XSS-Protection: 1; mode=block' (older browsers)
 SECURE_BROWSER_XSS_FILTER = True
+# Prevent the browser from guessing the content type
 SECURE_CONTENT_TYPE_NOSNIFF = True
+# Prevent this site from being framed to avoid clickjacking
 X_FRAME_OPTIONS = 'DENY'
 
 # Application definition
