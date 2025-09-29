@@ -1,10 +1,10 @@
 from django.utils import timezone
 from rest_framework import serializers
-from advanced_features_and_security.LibraryProject.relationship_app.models import Author
-from api_project.api.models import Book
+from .models import Author
+from .models import Book
 
 # The BookSerializer is nested on the AuthorSerializer
-class BookSerializer(serializers.ModelSerializer):
+class BookSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Book
         fields= '__all__'
@@ -21,4 +21,5 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Author
-        fields = ['name', 'book']
+        fields = ['id', 'name', 'book']
+
