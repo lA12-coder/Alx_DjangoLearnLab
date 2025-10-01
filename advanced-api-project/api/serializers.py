@@ -5,6 +5,8 @@ from .models import Book
 
 # The BookSerializer is nested on the AuthorSerializer
 class BookSerializer(serializers.HyperlinkedModelSerializer):
+
+
     class Meta:
         model = Book
         fields= '__all__'
@@ -18,7 +20,6 @@ class BookSerializer(serializers.HyperlinkedModelSerializer):
 
 class AuthorSerializer(serializers.ModelSerializer):
     book = BookSerializer(many=True, read_only=True)
-
     class Meta:
         model = Author
         fields = ['id', 'name', 'book']
