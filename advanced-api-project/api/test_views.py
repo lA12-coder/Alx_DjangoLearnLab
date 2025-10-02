@@ -7,7 +7,7 @@ from .factories import BookFactory
 from .serializers import BookSerializer
 
 
-class BookAPITests(APITestCase):g
+class BookAPITests(APITestCase):
     def setUp(self):
         """Create a user and authenticate for all tests."""
         User = get_user_model()
