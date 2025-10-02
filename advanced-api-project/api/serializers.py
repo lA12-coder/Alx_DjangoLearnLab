@@ -4,7 +4,7 @@ from .models import Author
 from .models import Book
 
 # The BookSerializer is nested on the AuthorSerializer
-class BookSerializer(serializers.HyperlinkedModelSerializer):
+class BookSerializer(serializers.ModelSerializer):
 
 
     class Meta:
