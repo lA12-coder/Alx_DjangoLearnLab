@@ -1,52 +1,45 @@
-import pytest
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework import status
-from .factories import BookFactory, AuthorFactory
-from rest_framework.test import APIClient
+from rest_framework.test import APITestCase
+
+from .factories import BookFactory
 from .serializers import BookSerializer
 
 
-@pytest.mark.django_db
-def test_create_book():
-    client = APIClient()
+class BookAPITests(APITestCase):g
+    def setUp(self):
+        """Create a user and authenticate for all tests."""
+        User = get_user_model()
+        self.user = User.objects.create_user(username="u", password="p")
+        self.client.force_authenticate(user=self.user)
 
-    #create and authenticate the user
-    User = get_user_model()
-    user = User.objects.create_user(username='u', password='p')
-    client.force_authenticate(user=user)
+    def test_create_book(self):
+        url = reverse("book_create")
+        book = BookFactory.create()
+        serialized_book = BookSerializer(book).data
 
-    url = reverse('book_create')
-    book = BookFactory.create()
-    serialized_book = BookSerializer(book).data
-    resp = client.post(url,serialized_book, format='json' )
-    assert resp.status_code == 201
-    assert resp.data['title'] == book.title
-    assert resp.data['author'] == book.author.id
+        response = self.client.post(url, serialized_book, format="json")
 
-@pytest.mark.django_db
-def test_update_book():
-    client = APIClient()
-    #create and authenticate the user
-    User = get_user_model()
-    user = User.objects.create_user(username='u', password='p')
-    client.force_authenticate(user=user)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["title"], book.title)
+        self.assertEqual(response.data["author"], book.author.id)
 
-    book = BookFactory.create()
-    url= '/api/books/update/' + f'{book.id}/'
-    resp = client.patch(url,{'title': 'updated'}, format='json' )
-    assert resp.status_code == 200
-    assert resp.data['title'] == 'updated'
+    def test_update_book(self):
+        book = BookFactory.create()
+        # If you have a named URL, prefer reverse("book_update", args=[book.id])
+        url = f"/api/books/update/{book.id}/"
 
-@pytest.mark.django_db
-def test_delete_book():
-    client = APIClient()
-    #create and authenticate the user
-    User = get_user_model()
-    user = User.objects.create_user(username='u', password='p')
-    client.force_authenticate(user=user)
+        response = self.client.patch(url, {"title": "updated"}, format="json")
 
-    book = BookFactory.create()
-    url= '/api/books/delete/' + f'{book.id}/'
-    resp = client.delete(url)
-    assert resp.status_code == status.HTTP_204_NO_CONTENT
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["title"], "updated")
+
+    def test_delete_book(self):
+        book = BookFactory.create()
+        # If you have a named URL, prefer reverse("book_delete", args=[book.id])
+        url = f"/api/books/delete/{book.id}/"
+
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
