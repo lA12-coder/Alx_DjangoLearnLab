@@ -9,10 +9,16 @@ from .serializers import BookSerializer
 
 class BookAPITests(APITestCase):
     def setUp(self):
-        """Create a user and authenticate for all tests."""
+        """Create a user and log in for all tests."""
         User = get_user_model()
-        self.user = User.objects.create_user(username="u", password="p")
-        self.client.force_authenticate(user=self.user)
+        self.username = "u"
+        self.password = "p"
+        self.user = User.objects.create_user(
+            username=self.username, password=self.password
+        )
+        # Perform a real login with credentials
+        logged_in = self.client.login(username=self.username, password=self.password)
+        self.assertTrue(logged_in)  # sanity check: make sure login worked
 
     def test_create_book(self):
         url = reverse("book_create")
