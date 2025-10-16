@@ -4,6 +4,11 @@ from django.contrib.auth.password_validation import validate_password
 from .models import CustomUser
 from rest_framework.authtoken.models import Token
 
+
+def get_token_for_user(user):
+    token, created  = Token.objects.create(user)
+    return token
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     password2 = serializers.CharField(write_only=True, required=True)
@@ -27,7 +32,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
-    password = serializers.CharField(write_only=True)
+    password = serializers.CharField()
 
     def validate(self, attrs):
         email = attrs.get('email')
