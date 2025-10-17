@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.shortcuts import render, get_object_or_404
+from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, generics
 from .filters import PostFilter
@@ -8,6 +8,8 @@ from .serializers import PostSerializer, CommentSerializer
 from rest_framework import permissions
 from rest_framework.response import Response
 from .models import Like, Post
+from ..notifications.models import Notification
+from ..notifications.serializers import NotificationSerializer
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -30,7 +32,7 @@ class FollowUserView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, user_id):
-        user_to_follow = get_object_or_404(get_user_model(), id=user_id)
+        user_to_follow = generics.get_object_or_404(get_user_model(), id=user_id)
         request.user.following.add(user_to_follow)
         return  Response({'message': 'You are now following {}'.format(user_to_follow.username)})
 
@@ -38,7 +40,7 @@ class UnfollowUserView(generics.DestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def delete(self, request, user_id):
-        user_to_unfollow = get_object_or_404(get_user_model(), id=user_id)
+        user_to_unfollow = generics.get_object_or_404(get_user_model(), id=user_id)
         request.user.following.remove(user_to_unfollow)
         return Response({'message': 'You have unfollowed {}'.format(user_to_unfollow.username)})
 
@@ -54,7 +56,7 @@ class LikePostView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, post_id):
-        post = get_object_or_404(Post, id=post_id)
+        post = generics.get_object_or_404(Post, id=post_id)
         like, created = Like.objects.get_or_create(user=request.user, post=post)
         if created:
             print(request.user, post.author, 'liked your post', post)  # To be changed with the create a notification function.
@@ -64,7 +66,16 @@ class LikePostView(generics.CreateAPIView):
 class UnlikePostView(generics.DestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def delete(self, request, post_id):
-        post = get_object_or_404(Post, id=post_id)
+    def delete(self, request, post_id, pk=None):
+        post = generics.get_object_or_404(Post, pk=pk)
         Like.objects.filter(user=request.user, post=post).delete()
         return Response({'message': 'Post unliked'})
+
+
+class NotificationListView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = NotificationSerializer
+
+    def get_queryset(self):
+        notification = Notification.objects.create()
+        return Notification.objects.filter(recipient=self.request.user).order_by('-timestamp')
