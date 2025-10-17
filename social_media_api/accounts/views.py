@@ -7,7 +7,6 @@ from rest_framework.authtoken.models import Token
 from .models import CustomUser
 from .serializers import RegisterSerializer, UserSerializer, LoginSerializer
 
-
 User = get_user_model()
 class RegistrationView(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
@@ -28,4 +27,3 @@ class UserProfileView(APIView):
     def get(self,request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
-    
