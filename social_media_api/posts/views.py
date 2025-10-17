@@ -5,7 +5,7 @@ from rest_framework import viewsets, generics
 from .filters import PostFilter
 from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework import permissions
 from rest_framework.response import Response
 from .models import Like, Post
 
@@ -13,7 +13,7 @@ from .models import Like, Post
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = (DjangoFilterBackend,)
     filterset_class = PostFilter
 
@@ -23,11 +23,11 @@ class PostViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
 class FollowUserView(generics.CreateAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, user_id):
         user_to_follow = get_object_or_404(get_user_model(), id=user_id)
@@ -35,7 +35,7 @@ class FollowUserView(generics.CreateAPIView):
         return  Response({'message': 'You are now following {}'.format(user_to_follow.username)})
 
 class UnfollowUserView(generics.DestroyAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def delete(self, request, user_id):
         user_to_unfollow = get_object_or_404(get_user_model(), id=user_id)
@@ -44,14 +44,14 @@ class UnfollowUserView(generics.DestroyAPIView):
 
 class UserFeedView(generics.ListAPIView):
     serializer_class = PostSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        return Post.objects.filter(author__in=self.request.user.following.all().order_by('-created_at'))
+    def get_queryset(self, following_users=None):
+        return Post.objects.filter(author__in=following_users).order_by('-created_at')
 
 
 class LikePostView(generics.CreateAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, post_id):
         post = get_object_or_404(Post, id=post_id)
@@ -62,7 +62,7 @@ class LikePostView(generics.CreateAPIView):
         return Response({'message': 'Already liked'}, status=400)
 
 class UnlikePostView(generics.DestroyAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def delete(self, request, post_id):
         post = get_object_or_404(Post, id=post_id)
