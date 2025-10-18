@@ -1,9 +1,8 @@
 from django.contrib.auth import get_user_model
-from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, generics
 from .filters import PostFilter
-from .models import Post, Comment
+from .models import Comment
 from .serializers import PostSerializer, CommentSerializer
 from rest_framework import permissions
 from rest_framework.response import Response
