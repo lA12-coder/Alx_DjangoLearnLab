@@ -93,6 +93,7 @@ DATABASES = {
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
         conn_max_age=int(os.environ.get('DB_CONN_MAX_AGE', '600')),
         ssl_require=os.environ.get('DB_SSL_REQUIRE', 'false').lower() == 'true',
+        PORT=8080,
     )
 }
 
