@@ -82,6 +82,22 @@ def add_comment(request, pk):
             comment.save()
     return redirect(post.get_absolute_url())
 
+
+class CommentCreateView(LoginRequiredMixin, CreateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'blog/comment_form.html'
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        # Expect view called with post pk in kwargs
+        post_pk = self.kwargs.get('pk')
+        form.instance.post = get_object_or_404(Post, pk=post_pk)
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return self.object.post.get_absolute_url()
+
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Comment
     form_class = CommentForm
