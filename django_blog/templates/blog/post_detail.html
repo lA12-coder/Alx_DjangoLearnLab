@@ -1,0 +1,46 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+<article>
+    <h1>{{ post.title }}</h1>
+    <p>By {{ post.author }} | {{ post.published_date }}</p>
+    <div>{{ post.content|linebreaks }}</div>
+    <p>Tags:
+        {% for t in post.tags.all %}
+        <a href="{% url 'blog:posts_by_tag' t.name %}">{{ t.name }}</a>{% if not forloop.last %}, {% endif %}
+        {% empty %}No tags{% endfor %}
+    </p>
+
+    {% if user == post.author %}
+    <p><a href="{% url 'blog:post_update' post.pk %}">Edit</a> | <a href="{% url 'blog:post_delete' post.pk %}">Delete</a></p>
+    {% endif %}
+</article>
+
+<section>
+    <h3>Comments</h3>
+    {% for c in post.comments.all %}
+    <div>
+        <p>{{ c.author }} | {{ c.created_at }}</p>
+        <p>{{ c.content }}</p>
+        {% if user == c.author %}
+        <a href="{% url 'blog:comment_edit' c.pk %}">Edit</a> |
+        <a href="{% url 'blog:comment_delete' c.pk %}">Delete</a>
+        {% endif %}
+    </div>
+    {% empty %}
+    <p>No comments yet.</p>
+    {% endfor %}
+</section>
+
+<section>
+    {% if user.is_authenticated %}
+    <h4>Add a comment</h4>
+    <form action="{% url 'blog:add_comment' post.pk %}" method="post">
+        {% csrf_token %}
+        {{ comment_form.as_p }}
+        <button type="submit">Add Comment</button>
+    </form>
+    {% else %}
+    <p><a href="{% url 'login' %}">Log in</a> to comment.</p>
+    {% endif %}
+</section>
+{% endblock %}

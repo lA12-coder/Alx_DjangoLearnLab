@@ -1,0 +1,41 @@
+{% extends "blog/base.html" %} {% load static %} {% block content %}
+<div class="container">
+  <div class="form-card">
+    <h1>Create New Post</h1>
+    <p class="muted">
+      Share your thoughts, experiences, or tutorials with the community.
+    </p>
+
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %} {{ form.non_field_errors }}
+
+      <div>
+        <label for="{{ form.title.id_for_label }}">Title</label>
+        {{ form.title }} {{ form.title.errors }}
+      </div>
+
+      <div>
+        <label for="{{ form.content.id_for_label }}">Content</label>
+        {{ form.content }} {{ form.content.errors }}
+      </div>
+
+      <div>
+        <label for="{{ form.tags.id_for_label }}">Tags (comma-separated)</label>
+        {{ form.tags }} {{ form.tags.errors }}
+      </div>
+
+      {% if form.image %}
+      <div>
+        <label for="{{ form.image.id_for_label }}">Upload Image</label>
+        {{ form.image }} {{ form.image.errors }}
+      </div>
+      {% endif %}
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Publish Post</button>
+        <a href="{% url 'blog:post_list' %}" class="ghost-btn">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
