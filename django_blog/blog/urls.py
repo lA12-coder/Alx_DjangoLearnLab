@@ -1,22 +1,45 @@
+
 from django.urls import path
-from . import views
+from .views import (
+    register_view,
+    CustomLoginView,
+    CustomLogoutView,
+    profile_view,
+    PostListView,
+    PostDetailView,
+    PostCreateView,
+    PostUpdateView,
+    PostDeleteView,
+    CommentCreateView,
+    post_detail,
+    CommentUpdateView,
+    CommentDeleteView,
+    PostByTagListView,
+    SearchResultsView,
+)
 
 app_name = 'blog'
 
 urlpatterns = [
-    path('', views.PostListView.as_view(), name='post_list'),
-    path('search/', views.PostListView.as_view(), name='search'),  # uses ?q=
-    path('tag/<str:tag>/', views.PostListView.as_view(), name='posts_by_tag'),
-    path('post/new/', views.PostCreateView.as_view(), name='post_create'),
-    path('posts/<int:pk>/', views.PostDetailView.as_view(), name='post_detail'),
-    path('post/<int:pk>/update/', views.PostUpdateView.as_view(), name='post_update'),
-    path('post/<int:pk>/delete/', views.PostDeleteView.as_view(), name='post_delete'),
-    # comments
-    path('posts/<int:pk>/comments/add/', views.add_comment, name='add_comment'),
-    path('posts/<int:pk>/comments/add-cbv/', views.CommentCreateView.as_view(), name='add_comment_cbv'),
-    path('comments/<int:pk>/edit/', views.CommentUpdateView.as_view(), name='comment_edit'),
-    path('comments/<int:pk>/delete/', views.CommentDeleteView.as_view(), name='comment_delete'),
-    # auth
-    path('register/', views.RegisterView.as_view(), name='register'),
-    path('profile/', views.profile_view, name='profile'),
+    # Authentication & Profile
+    path('register/', register_view, name='register'),
+    path('login/', CustomLoginView.as_view(), name='login'),
+    path('logout/', CustomLogoutView.as_view(), name='logout'),
+    path('profile/', profile_view, name='profile'),
+
+    # Post CRUD
+    path('post/new/', PostCreateView.as_view(), name='post-create'),
+    path('posts/', PostListView.as_view(), name='post-list'),
+    path('posts/<int:pk>/', PostDetailView.as_view(), name='post-detail'),
+    path('post/<int:pk>/update/', PostUpdateView.as_view(), name='post-update'),
+    path('post/<int:pk>/delete/', PostDeleteView.as_view(), name='post-delete'),
+
+    # Comment CRUD (singular paths)
+    path('post/<int:pk>/comments/new/', CommentCreateView.as_view(), name='comment-create'),
+    path('comment/<int:pk>/update/', CommentUpdateView.as_view(), name='comment-update'),
+    path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment-delete'),
+
+    # Tag filtering & Search
+    path('tags/<slug:tag_slug>/', PostByTagListView.as_view(), name='tag-posts'),
+    path('search/', SearchResultsView.as_view(), name='search'),
 ]
